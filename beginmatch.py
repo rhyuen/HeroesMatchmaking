@@ -3,7 +3,6 @@ import hero
 import player
 import team
 
-
 PLAYERS = [
     {"name": "PlayerOne", "playerLevel": 14, "latency": 29},
     {"name": "PlayerTwo", "playerLevel": 450, "latency": 12},
@@ -54,20 +53,34 @@ HEROES = [
 ]
 
 curr_game_heroes = []
-curr_game_teams = []
 curr_game_players = []
+ready_teams = []
+
+#Pairs of Similar Teams
 completed_games = []
 
-def set_rules():
-    """Add special rules to matchmaking"""
+def randomly_generate_players(num_to_make = 1):
+    "Number of RNG players to make."
+    count = 0
+    while count < num_to_make:
+        player_number = random.randint(0, 99999999999)
+        latest_player = {}
+        latest_player["name"] = "Player" + str(player_number)
+        latest_player["playerLevel"] = random.randint(1, 500)
+        latest_player["latency"] = random.randint(1, 1000)
+        PLAYERS.append(latest_player)
+        count += 1
+    print("%s players were added to the pool." % num_to_make)
 
 def add_players_to_game():
     """PLAYER DATA to PLAYER Class"""
     for curr_player in PLAYERS:
         curr_game_players.append(
             player.Player(
-                curr_player["name"], curr_player["playerLevel"], curr_player["latency"]
-                ))
+                curr_player["name"],
+                curr_player["playerLevel"],
+                curr_player["latency"]
+            ))
 
 def add_heroes_to_game():
     """HERO Data to Hero Class"""
@@ -76,28 +89,38 @@ def add_heroes_to_game():
 
 def players_set_heroes(player_list):
     """Randomly assign heroes to players"""
-    for listplayer in player_list:
-        listplayer.set_hero(curr_game_heroes[random.randint(0, len(curr_game_heroes))])
+    count = 0
+    for player_in_list in player_list:
+        print(count)
+        count += 1
+        player_in_list.set_hero(curr_game_heroes[random.randint(0, len(curr_game_heroes) - 1)])
+
+def set_rules():
+    """Add special rules to matchmaking"""
+    # Two Supporters at most per Team
+    # At most One Special Per Team
+
 
 
 def matchmaking():
     """Do matching for teams"""
-    teamOne = team.Team()
-    teamTwo = team.Team()
-    while (not teamOne.is_full()) and (not teamTwo.is_full()):
-        teamOne.add_player(curr_game_players[random.randint(0, 9)])
-        teamTwo.add_player(curr_game_players[random.randint(0, 9)])
-    print("done")
-    print(teamOne)
-    print(teamTwo)
+    team_one = team.Team()
+    team_two = team.Team()
+    while (not team_one.is_full()) and (not team_two.is_full()):
+        team_one.add_player(curr_game_players[random.randint(0, len(curr_game_players) - 1)])
+        team_two.add_player(curr_game_players[random.randint(0, len(curr_game_players) - 1)])
+    print_team_composition(team_one)
+    print_team_composition(team_two)
 
 def print_team_composition(denoted_team):
     "Prints heroes and team level."
-    print(denoted_team.get_team_level())
-    print(denoted_team.get_heroes())
+    print("Team Level: %s\n" % denoted_team.get_team_level())
+    for team_hero in denoted_team.get_heroes():
+        print(team_hero.get_name())
 
 def setup():
     """Setup matching state"""
+    randomly_generate_players(50)
     add_heroes_to_game()
     add_players_to_game()
     players_set_heroes(curr_game_players)

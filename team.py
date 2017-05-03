@@ -7,7 +7,10 @@ class Team:
 
     def get_heroes(self):
         """Returns list of heroes on team"""
-        return self.players
+        team_heroes = []
+        for curr_player in self.players:
+            team_heroes.append(curr_player.get_hero())
+        return team_heroes
 
     def get_team_level(self):
         """Adds all members levels together"""
@@ -22,5 +25,8 @@ class Team:
 
     def add_player(self, player):
         "Add player to team"
+        for curr_hero in self.get_heroes():
+            if curr_hero.get_name() == player.get_hero().get_name():
+                print("%s is already on the team." % player.get_hero().get_name())
         self.players.append(player)
 
