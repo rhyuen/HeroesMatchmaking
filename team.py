@@ -19,6 +19,32 @@ class Team:
             agg_team_level += player.get_player_level()
         return agg_team_level
 
+    def get_team_composition(self):
+        "As name suggests.  Returns Dict with Team Composition"
+        role_distro = {}
+        for curr_hero in self.get_heroes():
+            if curr_hero.get_role() in role_distro:
+                role_distro[str(curr_hero.get_role())] += 1
+            else:
+                role_distro[str(curr_hero.get_role())] = 1
+        return role_distro
+
+    def has_unique_hero(self):
+        """Checks if team has a unique hero"""
+        for curr_hero in self.get_heroes():
+            if curr_hero.is_unique():
+                return True
+        return False
+
+    def is_valid_player_addition(self, potential_player):
+        """Returns True if new player fits team.  True if Yes, False otherwise"""
+        return not (self.has_unique_hero() and potential_player.get_hero().is_unique())
+
+    def has_enough_support(self, potential_support, min_support=1, max_support=2):
+        "Returns Bool on whether or not team has enough support"
+        curr_team_composition = self.get_team_composition()
+        return False
+
     def is_full(self):
         "Checks if team has 5 players or not."
         return len(self.players) == 5
@@ -28,5 +54,6 @@ class Team:
         for curr_hero in self.get_heroes():
             if curr_hero.get_name() == player.get_hero().get_name():
                 print("%s is already on the team." % player.get_hero().get_name())
+                return
         self.players.append(player)
-
+        

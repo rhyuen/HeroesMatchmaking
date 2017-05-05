@@ -59,7 +59,7 @@ ready_teams = []
 #Pairs of Similar Teams
 completed_games = []
 
-def randomly_generate_players(num_to_make = 1):
+def randomly_generate_players(num_to_make=1):
     "Number of RNG players to make."
     count = 0
     while count < num_to_make:
@@ -100,26 +100,39 @@ def set_rules():
     # Two Supporters at most per Team
     # At most One Special Per Team
 
+def assemble_team():
+    "Make a balanced team"
+    newest_team = team.Team()
+    cycle_count = 0
+    cycle_limit = 300
+    while not newest_team.is_full():
+        newest_player = curr_game_players[random.randint(0, len(curr_game_players) - 1)]
+        if newest_team.is_valid_player_addition(newest_player):
+            newest_team.add_player(newest_player)
 
+        cycle_count += 1
+        if cycle_count >= cycle_limit:
+            print("Assemble_team is stuck in an infinite loop.")
+            return
+
+    return newest_team
 
 def matchmaking():
     """Do matching for teams"""
-    team_one = team.Team()
-    team_two = team.Team()
-    while (not team_one.is_full()) and (not team_two.is_full()):
-        team_one.add_player(curr_game_players[random.randint(0, len(curr_game_players) - 1)])
-        team_two.add_player(curr_game_players[random.randint(0, len(curr_game_players) - 1)])
-    print_team_composition(team_one)
-    print_team_composition(team_two)
+    print_team_composition(assemble_team())
+    print_team_composition(assemble_team())
 
 def print_team_composition(denoted_team):
     "Prints heroes and team level."
+    print("--------------------------------------------------")
     print("Team Level: %s\n" % denoted_team.get_team_level())
+    print(denoted_team.get_team_composition())
     for team_hero in denoted_team.get_heroes():
-        print(team_hero.get_name())
+        print("%s | %s" % (team_hero.get_name(), team_hero.get_role()))
+    print("--------------------------------------------------")
 
-def setup():
-    """Setup matching state"""
+def setup_world_state():
+    """Add players and heroes to game."""
     randomly_generate_players(50)
     add_heroes_to_game()
     add_players_to_game()
@@ -127,8 +140,7 @@ def setup():
 
 def main():
     """Main"""
-    setup()
+    setup_world_state()
     matchmaking()
-
 
 main()
