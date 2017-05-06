@@ -89,10 +89,7 @@ def add_heroes_to_game():
 
 def players_set_heroes(player_list):
     """Randomly assign heroes to players"""
-    count = 0
     for player_in_list in player_list:
-        print(count)
-        count += 1
         player_in_list.set_hero(curr_game_heroes[random.randint(0, len(curr_game_heroes) - 1)])
 
 def set_rules():
@@ -112,8 +109,7 @@ def assemble_team():
 
         cycle_count += 1
         if cycle_count >= cycle_limit:
-            print("Assemble_team is stuck in an infinite loop.")
-            return
+            return print("Assemble_team is stuck in an infinite loop.")
 
     return newest_team
 

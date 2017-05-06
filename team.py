@@ -24,9 +24,9 @@ class Team:
         role_distro = {}
         for curr_hero in self.get_heroes():
             if curr_hero.get_role() in role_distro:
-                role_distro[str(curr_hero.get_role())] += 1
+                role_distro[curr_hero.get_role()] += 1
             else:
-                role_distro[str(curr_hero.get_role())] = 1
+                role_distro[curr_hero.get_role()] = 1
         return role_distro
 
     def has_unique_hero(self):
@@ -38,22 +38,36 @@ class Team:
 
     def is_valid_player_addition(self, potential_player):
         """Returns True if new player fits team.  True if Yes, False otherwise"""
-        return not (self.has_unique_hero() and potential_player.get_hero().is_unique())
+        if self.is_duplicate(potential_player):
+            return False
+        if self.has_unique_hero() and potential_player.get_hero().is_unique():
+            return False
+        #Makes Sure Not Too much Support is Added
+        if self.has_enough_support() and (potential_player.get_hero().get_role() == "Support"):
+            return False
+        return True
 
-    def has_enough_support(self, potential_support, min_support=1, max_support=2):
+
+    def has_enough_support(self):
         "Returns Bool on whether or not team has enough support"
+        max_support = 2
         curr_team_composition = self.get_team_composition()
-        return False
+        if "Support" not in curr_team_composition:
+            return False
+        return not curr_team_composition.get("Support") < max_support
 
     def is_full(self):
         "Checks if team has 5 players or not."
         return len(self.players) == 5
 
+    def is_duplicate(self, potential_player):
+        "No doubles"
+        for curr_hero in self.get_heroes():
+            if curr_hero.get_name() == potential_player.get_hero().get_name():
+                print("%s is already on the team." % potential_player.get_hero().get_name())
+                return True
+        return False
+
     def add_player(self, player):
         "Add player to team"
-        for curr_hero in self.get_heroes():
-            if curr_hero.get_name() == player.get_hero().get_name():
-                print("%s is already on the team." % player.get_hero().get_name())
-                return
         self.players.append(player)
-        
