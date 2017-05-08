@@ -1,7 +1,10 @@
+"Makes it go."
+
 import random
 import hero
 import player
 import team
+import game
 
 PLAYERS = [
     {"name": "PlayerOne", "playerLevel": 14, "latency": 29},
@@ -17,22 +20,22 @@ PLAYERS = [
 ]
 
 HEROES = [
-    {"name": "Thrall", "type": "Assassin", "unique": False},
     {"name": "Abathur", "type": "Specialist", "unique": True},
-    {"name": "ETC", "type": "Warrior", "unique": False},
-    {"name": "Artanis", "type": "Warrior", "unique": False},
     {"name": "Probius", "type": "Specialist", "unique": True},
     {"name": "The Lost Vikings", "type": "Specialist", "unique": True},
     {"name": "Murky", "type": "Specialist", "unique": True},
+    {"name": "Gazlowe", "type": "Specialist", "unique": False},
+    {"name": "Azmodan", "type": "Specialist", "unique": False},
     {"name": "Nazeebo", "type": "Specialist", "unique": False},
     {"name": "Sylvanas", "type": "Specialist", "unique": False},
     {"name": "Sgt. Hammer", "type": "Specialist", "unique": False},
     {"name": "Xul", "type": "Specialist", "unique": False},
     {"name": "Medivh", "type": "Specialist", "unique": False},
     {"name": "Zagara", "type": "Specialist", "unique": False},
+    {"name": "Brightwing", "type": "Support", "unique": False},
+    {"name": "Kharazim", "type": "Support", "unique": False},
     {"name": "Lili", "type": "Support", "unique": False},
-    {"name": "Jaina", "type": "Assassin", "unique": False},
-    {"name": "Kaelthas", "type": "Assassin", "unique": False},
+    {"name": "Malfurion", "type": "Support", "unique": False},
     {"name": "Rehgar", "type": "Support", "unique": False},
     {"name": "Auriel", "type": "Support", "unique": False},
     {"name": "Uther", "type": "Support", "unique": False},
@@ -41,15 +44,46 @@ HEROES = [
     {"name": "Lt. Morales", "type": "Support", "unique": False},
     {"name": "Tassadar", "type": "Support", "unique": False},
     {"name": "Li-Ming", "type": "Assassin", "unique": False},
+    {"name": "Arthas", "type": "Warrior", "unique": False},
+    {"name": "Chen", "type": "Warrior", "unique": False},
+    {"name": "ETC", "type": "Warrior", "unique": False},
+    {"name": "Anub'arak", "type": "Warrior", "unique": False},
+    {"name": "Artanis", "type": "Warrior", "unique": False},
+    {"name": "Johanna", "type": "Warrior", "unique": False},
+    {"name": "Muradin", "type": "Warrior", "unique": False},
+    {"name": "Rexxar", "type": "Warrior", "unique": False},
+    {"name": "Sonya", "type": "Warrior", "unique": False},
+    {"name": "Stitches", "type": "Warrior", "unique": False},
     {"name": "Tyrael", "type": "Warrior", "unique": False},
+    {"name": "Zarya", "type": "Warrior", "unique": False},
+    {"name": "Varian", "type": "Warrior", "unique": False},
     {"name": "Diablo", "type": "Warrior", "unique": False},
     {"name": "Leoric", "type": "Warrior", "unique": False},
     {"name": "Dehaka", "type": "Warrior", "unique": False},
+    {"name": "Alarak", "type": "Assassin", "unique": False},
+    {"name": "Cassia", "type": "Assassin", "unique": False},
+    {"name": "Chromie", "type": "Assassin", "unique": False},
+    {"name": "Falstad", "type": "Assassin", "unique": False},
+    {"name": "Genji", "type": "Assassin", "unique": False},
+    {"name": "Guldan", "type": "Assassin", "unique": False},
+    {"name": "Greymane", "type": "Assassin", "unique": False},
+    {"name": "Illidan", "type": "Assassin", "unique": False},
+    {"name": "Jaina", "type": "Assassin", "unique": False},
+    {"name": "Kaelthas", "type": "Assassin", "unique": False},
+    {"name": "Kerrigan", "type": "Assassin", "unique": False},
+    {"name": "Lunara", "type": "Assassin", "unique": False},
+    {"name": "Thrall", "type": "Assassin", "unique": False},
     {"name": "Tracer", "type": "Assassin", "unique": False},
+    {"name": "Tychus", "type": "Assassin", "unique": False},
+    {"name": "Raynor", "type": "Assassin", "unique": False},
     {"name": "Ragnaros", "type": "Assassin", "unique": False},
+    {"name": "Samuro", "type": "Assassin", "unique": False},
+    {"name": "Valeera", "type": "Assassin", "unique": False},
+    {"name": "Butcher", "type": "Assassin", "unique": False},
     {"name": "Valla", "type": "Assassin", "unique": False},
     {"name": "Nova", "type": "Assassin", "unique": False},
     {"name": "Zeratul", "type": "Assassin", "unique": False},
+    {"name": "Zul'jin", "type": "Assassin", "unique": False}
 ]
 
 curr_game_heroes = []
@@ -101,7 +135,7 @@ def assemble_team():
     "Make a balanced team"
     newest_team = team.Team()
     cycle_count = 0
-    cycle_limit = 300
+    cycle_limit = 1000
     while not newest_team.is_full():
         newest_player = curr_game_players[random.randint(0, len(curr_game_players) - 1)]
         if newest_team.is_valid_player_addition(newest_player):
@@ -109,14 +143,38 @@ def assemble_team():
 
         cycle_count += 1
         if cycle_count >= cycle_limit:
-            return print("Assemble_team is stuck in an infinite loop.")
+            print("Assemble_team with Ideal Conditions taking too long.\n")
+            print(get_unassigned_players_roles())
+            # del newest_team
+            return
 
     return newest_team
 
 def matchmaking():
     """Do matching for teams"""
-    print_team_composition(assemble_team())
-    print_team_composition(assemble_team())
+    # While teams are in array, keep matching.
+    # Return rates of matching and time to match.
+    # Return length of time a player is in the wait queue for.
+    for num in range(5):
+        print("---------------------------------")
+        ready_teams.append(assemble_team())
+        print("---------------------------------")
+    print_global_team_levels()
+
+def print_global_team_levels():
+    "Get agg team levels for all teams"
+    for index, curr_team in enumerate(ready_teams):
+        print("TEAM%s: %s" % (index, curr_team.get_team_level()))
+
+def get_unassigned_players_roles():
+    "returns roles of teamless players."
+    teamless_player_dist = {}
+    for unassigned_player in curr_game_players:
+        if unassigned_player.get_hero().get_role() not in teamless_player_dist:
+            teamless_player_dist[unassigned_player.get_hero().get_role()] = 1
+        else:
+            teamless_player_dist[unassigned_player.get_hero().get_role()] += 1
+    return teamless_player_dist
 
 def print_team_composition(denoted_team):
     "Prints heroes and team level."
@@ -129,7 +187,7 @@ def print_team_composition(denoted_team):
 
 def setup_world_state():
     """Add players and heroes to game."""
-    randomly_generate_players(50)
+    randomly_generate_players(1000)
     add_heroes_to_game()
     add_players_to_game()
     players_set_heroes(curr_game_players)

@@ -23,3 +23,11 @@ class Player:
     def set_hero(self, hero):
         """Set Hero"""
         self.hero = hero
+
+    def get_timezone(self):
+        """Gets the timezone the player is zone."""
+        return ""
+
+    def is_in_party(self):
+        "Checks if player in party"
+        return False

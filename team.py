@@ -45,6 +45,13 @@ class Team:
         #Makes Sure Not Too much Support is Added
         if self.has_enough_support() and (potential_player.get_hero().get_role() == "Support"):
             return False
+        if len(self.players) == 4:
+            if not self.has_support() and potential_player.get_hero().get_role() == "Support":
+                return True
+            elif not self.has_warrior() and potential_player.get_hero().get_role() == "Warrior":
+                return True
+            else:
+                return False
         return True
 
 
@@ -55,6 +62,22 @@ class Team:
         if "Support" not in curr_team_composition:
             return False
         return not curr_team_composition.get("Support") < max_support
+
+
+    def has_support(self):
+        "Checks if teams has support."
+        for curr_hero in self.get_heroes():
+            if curr_hero.get_role() == "Support":
+                return True
+        return False
+
+    def has_warrior(self):
+        "Checks if team has a tank."
+        for curr_hero in self.get_heroes():
+            if curr_hero.get_role() == "Warrior":
+                return True
+        return False
+
 
     def is_full(self):
         "Checks if team has 5 players or not."
@@ -68,6 +91,10 @@ class Team:
                 return True
         return False
 
+    def is_cho_or_gall(self):
+        "Cho/gall cannot be added as the last player.  If Ch/Ga added, other must be added next."
+
     def add_player(self, player):
         "Add player to team"
+        print("%s added." % player.get_hero().get_name())
         self.players.append(player)
