@@ -1,9 +1,16 @@
 """Team module for MatchMaking"""
 
+import math
+import statistics
+
 class Team:
     "Team class.  Composed of players."
     def __init__(self):
         self.players = []
+
+    def get_players(self):
+        "Returns players on team."
+        return self.players
 
     def get_heroes(self):
         """Returns list of heroes on team"""
@@ -18,6 +25,17 @@ class Team:
         for player in self.players:
             agg_team_level += player.get_player_level()
         return agg_team_level
+
+    def get_avg_team_level(self):
+        "Return average team level."
+        return math.floor(self.get_team_level()/5)
+
+    def get_stdev_team_level(self):
+        "Return Standard deviation for team level."
+        player_levels = []
+        for player in self.players:
+            player_levels.append(player.get_player_level())
+        return statistics.stdev(player_levels)
 
     def get_team_composition(self):
         "As name suggests.  Returns Dict with Team Composition"
@@ -36,7 +54,7 @@ class Team:
                 return True
         return False
 
-    def is_valid_player_addition(self, potential_player):
+    def is_valid_player_addition(self, potential_player, is_taking_too_long=False):
         """Returns True if new player fits team.  True if Yes, False otherwise"""
         if self.is_duplicate(potential_player):
             return False
@@ -45,7 +63,7 @@ class Team:
         #Makes Sure Not Too much Support is Added
         if self.has_enough_support() and (potential_player.get_hero().get_role() == "Support"):
             return False
-        if len(self.players) == 4:
+        if len(self.players) == 4 and not is_taking_too_long:
             if not self.has_support() and potential_player.get_hero().get_role() == "Support":
                 return True
             elif not self.has_warrior() and potential_player.get_hero().get_role() == "Warrior":

@@ -8,6 +8,10 @@ class Player:
         self.latency = latency
         self.hero = ""
 
+    def get_name(self):
+        "player name getter."
+        return self.name
+
     def get_hero(self):
         """Hero getter"""
         return self.hero

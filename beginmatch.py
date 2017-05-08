@@ -126,11 +126,6 @@ def players_set_heroes(player_list):
     for player_in_list in player_list:
         player_in_list.set_hero(curr_game_heroes[random.randint(0, len(curr_game_heroes) - 1)])
 
-def set_rules():
-    """Add special rules to matchmaking"""
-    # Two Supporters at most per Team
-    # At most One Special Per Team
-
 def assemble_team():
     "Make a balanced team"
     newest_team = team.Team()
@@ -138,8 +133,14 @@ def assemble_team():
     cycle_limit = 1000
     while not newest_team.is_full():
         newest_player = curr_game_players[random.randint(0, len(curr_game_players) - 1)]
-        if newest_team.is_valid_player_addition(newest_player):
-            newest_team.add_player(newest_player)
+
+        if cycle_count >= cycle_limit * 0.8:
+            if newest_team.is_valid_player_addition(newest_player, True):
+                newest_team.add_player(newest_player)
+                print("Subideal addition: %s" % newest_player.get_hero().get_name())
+        else:
+            if newest_team.is_valid_player_addition(newest_player):
+                newest_team.add_player(newest_player)
 
         cycle_count += 1
         if cycle_count >= cycle_limit:
@@ -148,18 +149,32 @@ def assemble_team():
             # del newest_team
             return
 
+    #remove players that are in the team from the pool of players.
+    remove_players_from_pool(newest_team)
     return newest_team
+
+def remove_players_from_pool(remove_players_in_team):
+    "Removes players in teams from pool."
+    print(len(curr_game_players))
+    for curr_player in remove_players_in_team.get_players():
+        curr_game_players.remove(curr_player)
+        print("%s removed from pool." % curr_player.get_name())
+    print(len(curr_game_players))
+
 
 def matchmaking():
     """Do matching for teams"""
     # While teams are in array, keep matching.
     # Return rates of matching and time to match.
     # Return length of time a player is in the wait queue for.
-    for num in range(5):
+    for num in range(3):
         print("---------------------------------")
         ready_teams.append(assemble_team())
         print("---------------------------------")
     print_global_team_levels()
+
+def find_opponent():
+    
 
 def print_global_team_levels():
     "Get agg team levels for all teams"
