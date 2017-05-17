@@ -96,14 +96,21 @@ completed_games = []
 def randomly_generate_players(num_to_make=1):
     "Number of RNG players to make."
     count = 0
+    uuid = {}
     while count < num_to_make:
-        player_number = random.randint(0, 99999999999)
-        latest_player = {}
-        latest_player["name"] = "Player" + str(player_number)
-        latest_player["playerLevel"] = random.randint(1, 500)
-        latest_player["latency"] = random.randint(1, 1000)
-        PLAYERS.append(latest_player)
-        count += 1
+        player_number = random.randint(0, num_to_make*10)
+        if str(player_number) in uuid:
+            print("Number already in use: %s" % player_number)
+            continue
+        else:
+            uuid[str(player_number)] = 0
+
+            PLAYERS.append({
+                "name": "Player" + str(player_number),
+                "playerLevel": random.randint(1, 500),
+                "latency": random.randint(1, 1000)
+            })
+            count += 1
     print("%s players were added to the pool." % num_to_make)
 
 def add_players_to_game():
@@ -137,10 +144,14 @@ def assemble_team():
         if cycle_count >= cycle_limit * 0.8:
             if newest_team.is_valid_player_addition(newest_player, True):
                 newest_team.add_player(newest_player)
-                print("Subideal addition: %s" % newest_player.get_hero().get_name())
+                print("Subideal addition: %s (%s)" % (newest_player.get_hero().get_name(), newest_player.get_name()))
+                remove_player_from_region_pool(newest_player)
+            else:
+                print("Unaccounted for case.")
         else:
             if newest_team.is_valid_player_addition(newest_player):
                 newest_team.add_player(newest_player)
+                remove_player_from_region_pool(newest_player)
 
         cycle_count += 1
         if cycle_count >= cycle_limit:
@@ -149,24 +160,28 @@ def assemble_team():
             # del newest_team
             return
 
-    #remove players that are in the team from the pool of players.
-    remove_players_from_pool(newest_team)
     return newest_team
 
-def remove_players_from_pool(remove_players_in_team):
-    "Removes players in teams from pool."
-    print(len(curr_game_players))
-    for curr_player in remove_players_in_team.get_players():
-        curr_game_players.remove(curr_player)
-        print("%s removed from pool." % curr_player.get_name())
-    print(len(curr_game_players))
+def remove_player_from_region_pool(selected_player):
+    "Remove player from pool"
+    curr_game_players.remove(selected_player)
+    print("%s (%s) removed from region pool." % (selected_player.get_name(), selected_player.get_hero().get_name()))
 
+# def remove_players_from_pool(remove_players_in_team):
+#     "Removes players in teams from pool."
+#     print(len(curr_game_players))
+#     for curr_player in remove_players_in_team.get_players():
+#         curr_game_players.remove(curr_player)
+#         print("%s removed from pool." % curr_player.get_name())
+#     print(len(curr_game_players))
 
+"TODO: Match teams together."
+"TODO: While teams are in array, keep matching."
+"TODO: Return rates of matching and time to match."
+"TODO: Return length of time a player is in the wait queue for."
 def matchmaking():
     """Do matching for teams"""
-    # While teams are in array, keep matching.
-    # Return rates of matching and time to match.
-    # Return length of time a player is in the wait queue for.
+
     for num in range(3):
         print("---------------------------------")
         ready_teams.append(assemble_team())
@@ -174,21 +189,37 @@ def matchmaking():
     print_global_team_levels()
 
 def find_opponent():
-    
+    "Find opponent for matchmaking"
+    return ""
 
 def print_global_team_levels():
     "Get agg team levels for all teams"
     for index, curr_team in enumerate(ready_teams):
         print("TEAM%s: %s" % (index, curr_team.get_team_level()))
 
+
+def get_all_free_class_players(class_name):
+    "returns all available supports"
+    if not class_name in ["Warrior", "Support", "Specialist", "Assasin"]:
+        raise ValueError("%s is an invalid class name." % class_name)
+    else:
+        avail_class_player = []
+        for curr_player in curr_game_players:
+            if curr_player.get_hero().get_role() == class_name:
+                avail_class_player.append(curr_player)
+    return avail_class_player
+
+
+
 def get_unassigned_players_roles():
     "returns roles of teamless players."
     teamless_player_dist = {}
     for unassigned_player in curr_game_players:
-        if unassigned_player.get_hero().get_role() not in teamless_player_dist:
-            teamless_player_dist[unassigned_player.get_hero().get_role()] = 1
+        role = unassigned_player.get_hero().get_role()
+        if role in teamless_player_dist:
+            teamless_player_dist[role] += 1
         else:
-            teamless_player_dist[unassigned_player.get_hero().get_role()] += 1
+            teamless_player_dist[role] = 1
     return teamless_player_dist
 
 def print_team_composition(denoted_team):
@@ -200,9 +231,12 @@ def print_team_composition(denoted_team):
         print("%s | %s" % (team_hero.get_name(), team_hero.get_role()))
     print("--------------------------------------------------")
 
+
+
+
 def setup_world_state():
     """Add players and heroes to game."""
-    randomly_generate_players(1000)
+    randomly_generate_players(10)
     add_heroes_to_game()
     add_players_to_game()
     players_set_heroes(curr_game_players)
